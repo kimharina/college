@@ -1,4 +1,4 @@
- # **karina College**
+ # **Karina College**
 
 📌 **프로젝트 소개**
 
