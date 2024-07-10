@@ -1,0 +1,155 @@
+@charset "utf-8";
+
+#pop_zone {
+    position: absolute;
+    top: 0px;
+    left: 0%;
+    width: 100%;
+    margin-left: 0px;
+   /* 190212수정 */ z-index: 2;
+}
+#pop_zone .pop {
+	position: absolute;
+	top: 0;left: 0;
+    padding-bottom:35px;
+	z-index: 1;font-size:0;
+}
+
+#pop_zone .bgTop {overflow-x:hidden;width:100%;height:4px !important;background:#92c04c;}
+
+#pop_zone .pop .ct {
+	background: #fff;
+	width: 100%;
+	height: expression( this.scrollHeight > 99 ? "100px" : "auto" );
+	overflow-y: auto;
+	height:100%;
+}
+
+#pop_zone .pop .ct p img{
+	margin-bottom:-21px;
+}
+
+#pop_zone .pop .ct img {
+	display:block;
+	font-size:0
+}
+
+#pop_zone .pop .ct .pop_button{
+  width:70%;
+  overflow:hidden;
+  position:absolute;
+  bottom:60px;
+  left:50%;
+  margin-left:-35%;
+}
+#pop_zone .pop .ct .pop_button a {
+  display:block;
+  width:40%;
+  background-color:#3f9a2b;
+  text-align:center;
+  float:left;
+  padding:10px 15px;
+  letter-spacing: -1px;
+  font-size: 17px;
+  color: #fff;
+}
+#pop_zone .pop .ct .pop_button1 a {
+  display:block;
+  width:90%;
+  margin:0 auto;
+  background-color:#f36700;
+  float:none;
+  padding:10px 0px;
+  border-radius:30px;
+}
+#pop_zone .pop .ct .pop_button.pop_button2{
+  width:60%;
+  margin-left:-30%;
+}
+#pop_zone .pop .ct .pop_button.pop_button2 a{
+  width:37%;
+}
+#pop_zone .pop .ct .pop_button.pop_button2 a.output{
+  background-color:#f36700
+}
+
+/* 190118 수정 */
+.pop .close {
+    position: absolute;
+    height: 35px;
+	  background:#353541;
+    box-sizing:border-box;padding: 0 10px;
+    width:100%;bottom:0;
+}
+/* 190118 수정 끝 */
+
+.pop .close label {
+	font-size: 13px;
+	color: #fff;
+}
+
+/*.pop .close label input {
+    margin-top:-4px;
+}*/
+
+.pop .close .inp_c>input[type=checkbox] {width:10px;height:10px;margin:0 -18px 0 0;}
+.pop .close .inp_c>label {height:15px !important;padding:0 0 0 20px;background-size:15px 15px !important;line-height:15px !important;}
+
+.pop .close button {
+	position: absolute;
+	top: 3px;
+	right: 5px;
+	width: 30px;
+	height: 30px;
+	background: url(../img/common/popZone_close.png) no-repeat center;
+	font-size: 0;
+}
+
+@media screen and (max-width:760px) {
+
+
+    #pop_zone .pop {
+        box-sizing:border-box
+    }
+
+    #pop_zone {
+        top: 140px;
+        left: 0;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0 10px 0 10px;
+        text-align: center;
+    }
+
+        #pop_zone .pop {
+            display: inline-block;
+            position: relative;
+            top: 0 !important;
+            left: 0 !important;
+            margin: 0 5px 5px 0;
+            vertical-align: middle;
+            text-align: left;
+            width: 100% !important;
+            height:auto !important;
+        }
+
+        #pop_zone .pop .ct img {
+	        width:100% !important;
+        }
+
+        #pop_zone .pop .ct .pop_button{
+          width:90%;
+          margin-left:-45%;
+          bottom:48px;
+        }
+        #pop_zone .pop .ct .pop_button.pop_button2{
+          width:66%;
+          margin-left:-33%;
+          bottom:50px;
+        }
+
+		#pop_zone .pop .ct .pop_button a{font-size:14px;padding:8px 10px;}
+
+
+}

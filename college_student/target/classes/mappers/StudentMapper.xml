@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.college.admin.student.IStudentMapper">
+	
+	<insert id="stu_regist" parameterType="com.care.college.admin.student.StudentDTO">
+		INSERT INTO student_db VALUES (#{student_No}, #{name}, #{department_Name}, #{grade}, #{password}, #{tel}, #{email}, #{birth}, #{address})
+	</insert>
+	
+	<select id="stu_list" resultType="com.care.college.admin.student.StudentDTO">
+		SELECT * FROM student_db
+	</select>
+	
+	<select id="stu_info" resultType="com.care.college.admin.student.StudentDTO">
+		SELECT * FROM student_db WHERE student_No = #{student_No}
+	</select>
+	
+	<update id="stu_update" parameterType="com.care.college.admin.student.StudentDTO">
+		UPDATE student_db SET name=#{name}, department_Name=#{department_Name}, grade=#{grade}, password=#{password}, tel=#{tel}, email=#{email}, birth=#{birth}, address=#{address} WHERE student_No = #{student_No}
+	</update>
+	
+	<delete id="stu_delete">
+		DELETE FROM student_db WHERE student_No=#{student_No}
+	</delete>
+	
+</mapper>

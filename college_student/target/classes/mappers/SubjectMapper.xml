@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.college.admin.subject.ISubjectMapper">
+	
+	<insert id="sub_regist" parameterType="com.care.college.admin.subject.SubjectDTO">
+		INSERT INTO subject_db VALUES (#{subject_No}, #{department_Name}, #{subject_Name}, #{professor_No}, #{professor_Name}, #{day}, #{grade}, #{start_Time}, #{start_Time_Output}, #{end_Time}, #{end_Time_Output}, #{study_Time}, #{subject_Type}, #{subject_Point}, #{student_Count}, #{student_Count_ing})
+	</insert>
+	
+	<select id="sub_list">
+		SELECT * FROM subject_db
+	</select>
+	
+	<select id="sub_info">
+		SELECT * FROM subject_db WHERE subject_No=#{subject_No}
+	</select>
+	
+	<update id="sub_update">
+		UPDATE subject_db SET
+		department_Name=#{department_Name}, subject_Name=#{subject_Name}, professor_No=#{professor_No}, professor_Name=#{professor_Name}, day=#{day},
+		grade=#{grade}, start_Time=#{start_Time}, start_Time_Output=#{start_Time_Output}, end_Time=#{end_Time}, end_Time_Output=#{end_Time_Output},
+		study_Time=#{study_Time}, subject_Type=#{subject_Type}, subject_Point=#{subject_Point}, student_Count=#{student_Count}
+		WHERE subject_No=#{subject_No}
+	</update>
+	
+	<delete id="sub_delete">
+		DELETE FROM subject_db WHERE subject_No=#{subject_No}
+	</delete>
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.college.admin.professor.IProfessorMapper">
+
+	<insert id="pro_regist" parameterType="com.care.college.admin.professor.ProfessorDTO">
+		<selectKey resultType="int" keyProperty="professor_No" order="BEFORE">
+         	SELECT NVL(max(professor_No), 1) + 1 FROM professor_db
+     	</selectKey>
+     	
+		INSERT INTO professor_db (professor_No, professor_Name, department_Name) VALUES (#{professor_No}, #{professor_Name}, #{department_Name})
+	</insert>
+	
+	<select id="pro_list" resultType="com.care.college.admin.professor.ProfessorDTO">
+		SELECT * FROM professor_db
+	</select>
+	
+	<select id="pro_info" resultType="com.care.college.admin.professor.ProfessorDTO">
+		SELECT * FROM professor_db WHERE professor_No=#{professor_No}
+	</select>
+	
+	<select id="depart_pro_list">
+		SELECT professor_Name FROM professor_db WHERE department_Name=#{department_Name}
+	</select>
+	
+	<update id="pro_update">
+		UPDATE professor_db SET department_Name=#{department_New_Name}, professor_Name=#{professor_New_Name} WHERE professor_No=#{professor_No}
+	</update>
+	
+	<delete id="pro_delete">
+		DELETE FROM professor_db WHERE professor_No=#{professor_No}
+	</delete>
+	
+	<select id="find_pro_no">
+		SELECT professor_No FROM professor_db WHERE department_Name=#{pro_department} AND professor_Name=#{professor_Name}
+	</select>
+</mapper>
