@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.college.subject.Subject_Mapper">
+   <resultMap type="com.care.college.subject.Subject_DTO" id="subject_db">
+      <!-- <result column="cprice" property="cprice" /> -->
+   </resultMap>
+
+   <!-- 상품 리스트 -->
+   <!-- <select id="subject" resultMap="subject_db"> Select * from subject_db; 
+      </select> -->
+
+   <select id="searchSubject" resultMap="subject_db">
+      <![CDATA[
+         SELECT *
+         FROM subject_db
+         WHERE
+             (department_Name = #{department_Name} OR #{department_Name} = '' OR #{department_Name} IS NULL)
+             AND (subject_Name like CONCAT('%',#{subject_Name},'%'))
+            AND (professor_Name like CONCAT('%',#{professor_Name},'%'))
+             AND (day = #{day} OR #{day} = '' OR #{day} IS NULL)
+             AND (grade = #{grade} OR #{grade} = '' OR #{grade} IS NULL)
+             AND (start_Time >= #{sTime} OR #{sTime} = '' OR #{sTime} IS NULL)
+             AND (end_Time <= #{eTime} OR #{eTime} = '' OR #{eTime} IS NULL)
+             AND (subject_Type = #{subject_Type} OR #{subject_Type} = '' OR #{subject_Type} IS NULL)
+             AND (subject_Point = #{subject_Point} OR #{subject_Point} = '' OR #{subject_Point} IS NULL)
+             AND (subject_No = #{subject_No} OR #{subject_No} = '' OR #{subject_No} IS NULL)
+      ]]>
+      <choose>
+          <when test="Order == 'Asc'">
+            ORDER BY start_Time ASC;
+         </when>
+          <when test="Order == 'Desc'">
+            ORDER BY start_Time DESC;
+         </when>
+         <otherwise>;</otherwise>
+      </choose>
+   </select>
+   
+   <select id="Start_Time">
+      SELECT Class_Time_Code FROM class_time_db WHERE
+      Class_Time=#{start_Time_Output}
+   </select>
+   <select id="End_Time">
+      SELECT Class_Time_Code FROM class_time_db WHERE
+      Class_Time=#{end_Time_Output}
+   </select>
+   <select id="getSubject">
+      SELECT * FROM subject_db WHERE subject_No=#{subject_No}
+   </select>
+
+   <!-- 상품 리스트 -->
+   <!-- <select id="subject" resultMap="subject_db"> Select * from subject_db; 
+      </select> -->
+   <select id="getName">
+      SELECT Name FROM student_db WHERE student_no=#{no}
+   </select>
+   <select id="getNo">
+      SELECT Student_No FROM student_db WHERE student_no=#{no}
+   </select>
+   <select id="getPw">
+      SELECT Password FROM student_db WHERE student_no=#{no}
+   </select>
+   <select id="getDepartment">
+      SELECT Department_Name FROM student_db WHERE student_no=#{no}
+   </select>
+   <select id="subject" parameterType="com.care.college.subject.Subject_DTO">
+      SELECT *
+      FROM Subject_DB
+      <where>
+         <if test="grade != null and grade != ''">
+            AND Grade = #{grade}
+         </if>
+         <!-- <if test="professor != null and professor != ''"> AND Professor_Name 
+            = #{professor} </if> <if test="subjectName != null and subjectName != ''"> 
+            AND Subject_Name = #{subjectName} </if> -->
+      </where>
+   </select>
+
+   <select id="cart" parameterType="com.care.college.subject.Subject_DTO">
+      SELECT * FROM Subject_DB;
+   </select>
+   
+   <select id="searchCart" parameterType="com.care.college.subject.Subject_DTO">
+      SELECT * FROM Subject_DB 
+      <choose>
+           <when test="search == null">
+           </when>
+           <when test="select == 'subject_No'">
+               WHERE subject_No=#{search}
+           </when>
+           <otherwise>
+               WHERE subject_Name like CONCAT('%',#{search},'%')
+           </otherwise>
+       </choose>
+   </select>
+
+
+   <!-- <select id="getMajorSubjects" parameterType="com.care.college.student.StudentDTO"> 
+      SELECT * FROM student_db WHERE Department = #{Department} </select> -->
+
+
+    <select id="getMajorSubjects" resultType="com.care.college.subject.Subject_DTO">
+       SELECT * FROM subject_db 
+       WHERE Department_Name = #{department}
+    </select>
+    
+    <insert id="saveData" parameterType="com.care.college.subject.Cart_DTO">
+       INSERT INTO subject_cart_db (subject_No, student_No)
+       VALUES (#{subject_No}, #{student_No})
+   </insert>
+    
+    <select id="get_Class_Time_Code">
+      SELECT Class_Time_Code FROM Class_Time_DB
+   </select>
+
+   <select id="get_Subject_Schedule">
+      SELECT * FROM Subject_Schedule_DB WHERE student_No = #{Student_No}
+   </select>
+   
+   <select id="getSchedule">
+      SELECT * FROM Subject_Schedule_DB WHERE Student_No = #{student_No} and day = #{day}
+   </select>
+   
+   <select id="getCartSub">
+      SELECT * FROM subject_cart_db WHERE Student_No = #{student_No} and day = #{day}
+   </select>
+   
+   <update id="studentPlus">
+      UPDATE subject_db
+      SET student_Count_ing = student_Count_ing + 1
+      WHERE subject_No = #{subject_No};
+   </update>
+   
+   <insert id="saveSchedule">
+       INSERT INTO subject_schedule_db VALUES (#{student_No}, #{name}, 
+                #{subjects.department_Name}, #{subjects.subject_No}, 
+                #{subjects.subject_Name}, #{subjects.professor_No}, 
+                #{subjects.professor_Name}, #{subjects.grade}, 
+                #{subjects.day}, #{subjects.start_Time}, 
+                #{subjects.start_Time_Output}, #{subjects.end_Time}, 
+                #{subjects.end_Time_Output}, #{subjects.study_Time}, 
+                #{subjects.subject_Type}, #{subjects.subject_Point})
+   </insert>
+   
+   <select id="cartList">
+       SELECT * from subject_cart_db WHERE student_No = #{student_No}
+   </select>
+   
+</mapper>

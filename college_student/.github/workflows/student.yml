@@ -1,0 +1,105 @@
+name: college_subject_build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      REPOSITORY: college
+      AWS_REGION: ap-northeast-2
+      AWS_ACCOUNT_ID: 139394721163
+      PROJECT_TYPE: student
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Print Variables
+        run: |
+          echo "Repository: $REPOSITORY"
+          echo "AWS Account ID: $AWS_ACCOUNT_ID"
+          echo "AWS Region: $AWS_REGION"
+      - name: Build JAR File
+        run: |
+          chmod 777 ./*
+          ./mvnw clean package
+          
+      - name: Configure AWS credentials                                # AWS Credentials 정보 정의 
+        uses: aws-actions/configure-aws-credentials@v1                 # configure-aws-credentials Action 사용
+        with:                                                          # ci-cd-test Repository 생성 시 정의 한 Secrets 환경변수 사용
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}          # AWS_ACCESS_KEY_ID Secrets 환경변수
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS_SECRET_ACCESS_KEY Secrets 환경변수 
+          aws-region: ${{ env.AWS_REGION }}                            # AWS REGION 정보
+  
+      - name: Login to Amazon ECR                                      # AWS ECR Login 정보 정의
+        id: login-ecr                                                  # ECR Login 작업 식별 ID 정의 ( Steps 내부 각 작업을 식별하는 값 )
+        uses: aws-actions/amazon-ecr-login@v1                          # amazon-ecr-login Action 사용
+  
+      - name: Get image tag(version)                                   # Image Tag 정보 정의
+        id: tag-image                                                  # Image Tag 작업 식별 ID 정의
+        run: |
+          VERSION=$(echo ${{ github.sha }} | cut -c1-5)                # GitHub Hash Value 5자리 추출 및 VERSION 변수 정의
+          TYPE=${{ env.PROJECT_TYPE }}
+          echo VERSION=$VERSION                                        # VERSION 변수 재정의
+          echo "::set-output name=version::$TYPE-$VERSION"           # 정의 된 VERSION 변수 OutPut 정의 ( Output 이름 : version )
+          
+      - name: Docker Build and Tag and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        # ECR Login 작업 결과에서 Registry 정보를 가져와 ECR_REGISTRY 환경변수로 등록
+          ECR_REPOSITORY: college                                      # ECR Repository 정보를 환경변수로 등록
+          IMAGE_TAG: ${{ steps.tag-image.outputs.version }}            # IMAGE_TAG 환경변수에 tag-image 작업에서 정의한 값을 등록
+          
+          
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $GITHUB_WORKSPACE/Dockerfile $GITHUB_WORKSPACE/
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG         # Container Image AWS ECR Push
+          echo "::set-output name=repository::$ECR_REPOSITORY"         # 정의 된 ECR_REPOSITORY 환경변수 OutPut 정의 ( Output 이름 : repository )
+          echo "::set-output name=tag-image::$IMAGE_TAG"               # 정의 된 IMAGE_TAG 환경변수 OutPut 정의 ( Output 이름 : tag-image )
+          
+    outputs:                                                         # Job Output 정의
+      image_tag: ${{ steps.tag-image.outputs.version }}              # Image Tag 정보 출력
+      sha: ${{ github.sha }}                                         # GitHub Hash 출력
+
+  deploy:                                                            # Deploy Job 영역 시작
+    needs: build-and-deploy                                          # Build Job 완료 후 Deploy Job 수행
+    name: Helm Chart Update                                          # 이름 지정
+    runs-on: ubuntu-latest                                           # Runner 지정 ( Job-Container )
+    env:                                                             # Deploy Job 환경변수 정의
+      IMAGE_TAG: ${{ needs.build-and-deploy.outputs.image_tag }}     # Build Job에서 정의한 Outputs image_tag를 이용하여 IMAGE_TAG 환경변수 정의
+      GIT_ACCESS_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}                 # GIT_HUB_TOKEN Secrets 환경변수
+      HASH: ${{ needs.build-and-deploy.outputs.sha }}                # Build Job에서 정의한 Outputs sha를 이용하여 HASH 환경변수 정의
+      GIT_REPO: kimharina/college_student_code.git  # Helm Chart Repo 주소
+      
+    steps:
+      - name: Clone Deploy repository                                # 위에서 정의 된 환경변수를 활용하여 Helm Chart Repo Clone
+        uses: actions/checkout@v2                                    # Checkout Action 사용
+        with:
+          repository: ${{ env.GIT_REPO }}                            # Helm Chart Repo 지정
+          ref: 'main'                                                # Main Branch 지정
+          token: ${{ env.GIT_ACCESS_TOKEN }}                         # GitHub Access Token 지정
+      
+      - name: Image Tag Change                                       # Clone 된 Helm Chart Repo Image Tag 변경
+        uses: mikefarah/yq@v4.9.6                                    # mikefarah/yq@v4.9.6 Action 사용
+        with:                                                        # values.yaml -> ".image.tag"를 찾아 변경 된 Tag로 Replace
+          cmd: yq e --inplace '.image.tag = "${{ env.IMAGE_TAG }}"' values.yaml
+          
+      - name: Create Pull Request                                    # Helm Chart Repo Pull Request 생성 
+        uses: peter-evans/create-pull-request@v6                     # peter-evans/create-pull-request Action 사용
+        with:
+          title: 'deploy: college-${{ env.HASH }}'                    # Pull Request 작업 이름
+          token: ${{ env.GIT_ACCESS_TOKEN }}                         # GitHub Access Token 지정
+          base: main                                                 # Pull Request를 요청 할 Branch 지정 ( Helm Chart Repo )
+          branch: college-${{ env.PROJECT_TYPE }}-${{ env.HASH }}    # 변경 작업을 수행 할 Branch 지정 ( Action을 수행하는 곳애서 Branch 생성 )
+          commit-message: 'deploy: college-${{ env.HASH }}'           # Commit Message 지정
+          labels: automerge                                                  # Pull Request Label 지정

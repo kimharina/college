@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.care.college.student.StudentMapper_Student"> 
+<resultMap type="com.care.college.student.StudentDTO_Student" id="student_db"></resultMap>
+	<select id="login">
+		SELECT * FROM student_db WHERE student_No=#{student_no}
+	</select>
+	<select id="sendData" resultMap="student_db">
+		SELECT student_No, name FROM student_db WHERE student_No=#{student_No}
+	</select>
+
+	<update id="updateInfo">
+		UPDATE student_db
+		SET tel=#{tel}, email=#{email},
+		birth=#{birth}, address=#{address}
+		WHERE student_No=#{student_No}
+	</update>
+	<update id="changePw">
+		UPDATE student_db
+		SET password=#{password}
+		WHERE student_No=#{student_No}
+	</update>
+	<select id="searchStNum">
+		SELECT ifnull(max(student_No),0) FROM student_db WHERE name=#{name} AND department_Name=#{department} AND tel=#{tel};
+	</select>
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.college.admin.department.IDepartmentMapper">
+	
+	<insert id="depart_regist" parameterType="com.care.college.admin.department.DepartmentDTO">
+		<selectKey resultType="int" keyProperty="department_No" order="BEFORE">
+         	SELECT NVL(max(department_No), 0)+1 FROM department_db
+     	</selectKey>
+
+		INSERT INTO department_db (department_No, department_Name) VALUES (#{department_No}, #{department_Name})
+	</insert>
+	
+	<select id="depart_list" resultType="com.care.college.admin.department.DepartmentDTO">
+		SELECT * FROM department_db
+	</select>
+	
+	<select id="depart_info">
+		SELECT * FROM department_db WHERE department_Name=#{department_Name}
+	</select>
+	
+	<update id="student_count_plus">
+		UPDATE department_db SET student_Count = student_Count +1 WHERE department_Name=#{department_Name}
+	</update>
+	
+	<update id="student_count_minus">
+		UPDATE department_db SET student_Count = student_Count -1 WHERE department_Name=#{department_Name}
+	</update>
+	
+	<update id="sub_count_plus">
+		UPDATE department_db SET subject_Count = subject_Count +1 WHERE department_Name=#{department_Name}
+	</update>
+	
+	<update id="sub_count_minus">
+		UPDATE department_db SET subject_Count = subject_Count -1 WHERE department_Name=#{department_Name}
+	</update>
+	
+	<update id="depart_update">
+		UPDATE department_db SET department_Name=#{department_New_Name} WHERE department_No=#{department_No}
+	</update>
+	
+	<delete id="depart_delete">
+		DELETE FROM department_db WHERE department_Name = #{department_Name}
+	</delete>
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.college.subject.Subject_Mapper">
+		<!-- <resultMap type="com.care.college.cart.CartDTO"
+		id="subject_cart_db"> -->
+		<!-- <result column="cprice" property="cprice" /> -->
+		<!-- </resultMap> -->
+		
+	<!-- CartMapper.xml -->
+	<insert id="insertData" parameterType="com.care.college.subject.Cart_DTO">
+	    INSERT INTO subject_cart_db (Student_No, Student_Name, subject_No, Department_Name, Subject_Name, Professor_No, Professor_Name, Grade, Day, Start_Time, Start_Time_Output, End_Time, End_Time_Output, Study_Time, Subject_Type, Subject_Point, Student_Count)
+		SELECT sd.Student_No, sd.Name, sb.subject_No, sb.Department_Name, sb.Subject_Name, sb.Professor_No, sb.Professor_Name, sb.Grade, sb.Day, sb.Start_Time, sb.Start_Time_Output, sb.End_Time, sb.End_Time_Output, sb.Study_Time, sb.Subject_Type, sb.Subject_Point, sb.Student_Count
+		FROM student_db sd
+		JOIN subject_db sb ON sb.Subject_No = #{subject_No}
+		WHERE sd.Student_No = #{student_no}
+	</insert>
+	
+	<select id="checkCartData">
+		SELECT COALESCE(MAX(subject_No), 0)  
+		FROM subject_cart_db 
+		WHERE subject_No=#{subjectNo} AND student_No=#{student_No}
+	</select>
+	
+	<!-- cart.jsp -->
+	<select id="showCart" parameterType="com.care.college.subject.Cart_DTO">
+		SELECT * FROM subject_cart_db WHERE student_No=#{student_No}
+	</select>
+	
+	<delete id="cartShowdelete" parameterType="com.care.college.subject.Cart_DTO">
+    	DELETE FROM subject_cart_db WHERE subject_No=#{subject_No}
+	</delete>
+	
+	<delete id="cart_deleteAll" parameterType="com.care.college.subject.Cart_DTO">
+    	DELETE FROM subject_cart_db WHERE student_No = #{student_No}
+	</delete>
+	
+	<!-- sugang.jsp -->
+	<select id="requestCart" parameterType="com.care.college.subject.Cart_DTO">
+		SELECT * FROM subject_cart_db WHERE student_No=#{student_no}
+	</select>
+	
+	<delete id="deleteCart" parameterType="com.care.college.subject.Cart_DTO">
+    	DELETE FROM subject_cart_db WHERE subject_No=#{subject_No}
+	</delete>
+	
+   <select id="getCartData" parameterType="com.care.college.subject.Cart_DTO">
+       SELECT * from subject_cart_db WHERE student_No = #{student_No}
+   </select>
+   
+   <insert id="addToSubjectSchedule" parameterType="java.util.List">
+	    <!-- 여러 개의 Cart_DTO를 처리하는 SQL -->
+	    INSERT INTO subject_schedule_db (Student_No, Student_Name, subject_No, Department_Name, Subject_Name, Professor_No, Professor_Name, Grade, Day, Start_Time, Start_Time_Output, End_Time, End_Time_Output, Study_Time, Subject_Type, Subject_Point)
+	    VALUES
+	    <foreach collection="list" item="item" separator=",">
+	        (#{item.student_No}, #{item.Student_Name}, #{item.subject_No}, #{item.department_Name}, #{item.subject_Name}, #{item.professor_No}, #{item.professor_Name}, #{item.grade}, #{item.day}, #{item.start_Time}, #{item.start_Time_Output}, #{item.end_Time}, #{item.end_Time_Output}, #{item.study_Time}, #{item.subject_Type}, #{item.subject_Point})
+	    </foreach>
+   </insert>
+	
+   <select id="getExistingSubjects" parameterType="int" resultType="java.lang.Integer">
+    	SELECT subject_No FROM subject_schedule_db WHERE Student_No = #{student_No}
+   </select>
+
+</mapper>
