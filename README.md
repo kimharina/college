@@ -10,7 +10,7 @@
 
 📌 **사용스킬**
 
-      java, aws, gitAction, argoCD, prometeus, MariaDB, STS, VSCode, kubernetese, Grafana, terraform, JWT
+      java, aws, gitAction, argoCD, prometeus, MariaDB, SpringBoot, VSCode, kubernetese, Grafana, terraform, JWT
 
 
 📌 **진행기간**
