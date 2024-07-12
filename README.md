@@ -10,7 +10,7 @@
 
 📌 **사용스킬**
 
-      java, aws, gitAction, argoCD, prometeus, MariaDB, SpringBoot, VSCode, kubernetese, Grafana, terraform, JWT
+      java, aws, gitAction, argoCD, prometheus, MariaDB, SpringBoot, VSCode, kubernetese, Grafana, terraform, JWT
 
 
 📌 **진행기간**
@@ -87,7 +87,7 @@
 - CI/CD :  Git Hub Git Action, ECR ArgoCD
 - Web Service Image를 사용자는 Domain을 통해 접근한 후 ACM에서 Cname을 통한 인증과 WAF를 거친 후 로드밸런서를 통해 ECR내의 EKS에 있는 노출된 pod로 접속하게 구축하였습니다.
 - 트래픽이 몰릴 경우 필요한 서비스만 늘어날 수 있게 하기 위해 MSA방식을 도입하였습니다.  ingress를 사용하여 url 구분을 통해 학생 용과 수강 신청 용 사이트를 분리하였습니다.
-- prometeus와 grafana 이용해 모니터링 할 수 있도록 하였습니다.
+- prometheus grafana 이용해 모니터링 할 수 있도록 하였습니다.
 
   
 ✔️ **나의 담당 기능**
