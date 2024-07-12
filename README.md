@@ -67,36 +67,59 @@
     - 시간표
     
 
-## 2. Ops
-  
-- 깃액션
+# 2. Ops
 
-- ECR + 아르고CD
+
+- Route 53
+
+- CI/CD 깃액션
+
+- ArgoCD
+
+- ECR
 
 - EKS
-
-- ingress
 
 - kubenetes
 
 - terraform 
 
 
-✔️ **요약**
+### ✔️ **요약**
 
-- CI/CD :  Git Hub Git Action, ECR ArgoCD
-- Web Service Image를 사용자는 Domain을 통해 접근한 후 ACM에서 Cname을 통한 인증과 WAF를 거친 후 로드밸런서를 통해 ECR내의 EKS에 있는 노출된 pod로 접속하게 구축하였습니다.
-- 트래픽이 몰릴 경우 필요한 서비스만 늘어날 수 있게 하기 위해 MSA방식을 도입하였습니다.  ingress를 사용하여 url 구분을 통해 학생 용과 수강 신청 용 사이트를 분리하였습니다.
-- prometheus grafana 이용해 모니터링 할 수 있도록 하였습니다.
-
-  
-✔️ **나의 담당 기능**
-
-- 쿠버네티스 - 로드밸런서 생성, 인그레스를 통해 도메인 URL을 /student /subject로 분리, Helm 설치
+- CI/CD :  GitHub에 소스크드 repository에 push할 경우 이를 감지해 Git Action 이 동작하고
+Docker Image 파일로 빌드를 진행합니다. AWS ECR로 image를 배포하게 됩니다.
     
-- 테라폼 - vpc, 서브넷, ecr, eks, bastion EC2, 보안그룹
+    그 후 Pull Request로 HelmChart가 저장된 Repository에 또 다른 Git Action을 동작시켜 Values.yaml 파일에 지정된 image tag를 현재 build된 image tag로 merge시켜서 ArgoCd가 변경된 values.yaml파일을 보고 동기화하여 새로운 image를 배포할 수 있게 했고 이전에 build된 이미지와 image tag로 구분하여 버전 관리도 가능하게 구성 했습니다.
+    
+- 사용자는 Domain을 통해 접근한 후 WAF를 거친 후 로드밸런서를 통해 ECR내의 EKS에 있는 노출된 pod로 접속하도록 구성하였습니다.
+- 트래픽이 몰릴 경우 필요한 서비스만 늘어날 수 있게 하기 위해 MSA방식을 도입하였습니다.  ingress를 사용하여 url 구분을 통해 학생 용과 수강 신청 용 사이트를 분리하였습니다.
+- prometeus와 grafana를 이용해 모니터링 할 수 있도록 하였습니다.
 
-## 3. 보완점 및 느낀점
+### ✔️ **나의 담당 기능**
+
+- **쿠버네티스**
+    
+          로드밸런서 생성
+  
+          인그레스를 통해 도메인 URL을 /student, /subject로 분리
+    
+- **테라폼**
+    
+           vpc, 
+    
+           서브넷,
+    
+           ecr, 
+    
+           eks, 
+    
+           bastion EC2, 
+    
+           보안그룹
+    
+
+# 3. 보완점 및 느낀점
 
 MSA 형식으로 처음 프로젝트를 해봐서 로그인 방식에서 토큰 유지를 시키는 방법, CI/CD시에 많은 용량을 필요로 해서 예산을 늘리거나 다른 방식의 CI/CD를 선택 해야 하는 과정 등에서 어려움이 있었습니다. 
 
@@ -108,5 +131,4 @@ MSA로 프로젝트를 진행한 결과 좀 더 큰 용량의 EC2가 필요하�
 
 Ingress를 URL을 통해 분리를 할 때 URL 정리가 완벽히 되지 않아서 다시 개발 단계로 돌아가기도 하였습니다.
 
-아쉬웠던 점은 개발과 인프라 팀의 진행 과정을 서로 공유하고 시도 해볼 수 있도록 각각 스터디시간을 중간 중간 갖기로 했던 목표는  완료하지 못하였습니다. 하지만 각자 서로의 진행 과정을 대략 정리 해놓았기에 프로젝트 완료 후에 내가 하지 않은 파트까지 공부해보고 따라해 볼 수 있었습니다.  
-
+아쉬웠던 점은 개발과 인프라 팀의 진행 과정을 서로 공유하고 시도 해볼 수 있도록 각각 스터디시간을 중간 중간 갖기로 했던 목표는  완료하지 못하였습니다. 하지만 각자 서로의 진행 과정을 대략 정리 해놓았기에 프로젝트 완료 후에 내가 하지 않은 파트까지 공부해보고 따라해 볼 수 있었습니다.
