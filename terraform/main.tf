@@ -9,7 +9,7 @@ terraform {
 }
 provider "aws" {
   region  = "ap-northeast-2"
-  profile = "root"
+  profile = "admin"
 }
 
 # 2. VPC, Subnet
@@ -65,8 +65,8 @@ module "eks" {
   manage_aws_auth_configmap = true
   aws_auth_users = [
     {
-      userarn  = "arn:aws:iam::${data.aws_iam_user.EKS_Admin_ID.id}:user/root"
-      username = "root"
+      userarn  = "arn:aws:iam::${data.aws_iam_user.EKS_Admin_ID.id}:user/admin"
+      username = "admin"
       groups   = ["system:masters"]
     },
   ]
@@ -79,12 +79,12 @@ provider "kubernetes" {
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
-    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name, "--profile", "root"]
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name, "--profile", "admin"]
   }
 }
 # 6.Kubernetes Account와 연결할 AWS 계정
 data "aws_iam_user" "EKS_Admin_ID" {
-  user_name = "root"
+  user_name = "admin"
 }
 
 # 7.보안그룹
