@@ -32,21 +32,21 @@ resource "aws_ecr_repository" "foo" {
   }
 }
 
-# 3.EKS
+# 4.EKS
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 19.0"
 
-  # 3-1.EKS Cluster Setting
+  # 4-1.EKS Cluster Setting
   cluster_name    = "college-eks"
   cluster_version = "1.28"
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.private_subnets
 
-  # 3-2.OIDC(OpenID Connect) 구성 
+  # 4-2.OIDC(OpenID Connect) 구성 
   enable_irsa = true
 
-  # 3-3.EKS Worker Node 정의 ( ManagedNode방식 / Launch Template 자동 구성 )
+  # 4-3.EKS Worker Node 정의 ( ManagedNode방식 / Launch Template 자동 구성 )
   eks_managed_node_groups = {
     college_WorkerNode = {
       instance_types         = ["t3.large"]
@@ -57,7 +57,7 @@ module "eks" {
     }
   }
 
-  # 3-4.public-subnet(bastion)과 API와 통신하기 위해 설정(443)
+  # 4-4.public-subnet(bastion)과 API와 통신하기 위해 설정(443)
   cluster_additional_security_group_ids = [module.add_cluster_sg.security_group_id]
   cluster_endpoint_public_access        = true
 
@@ -72,7 +72,7 @@ module "eks" {
   ]
 }
 
-# 4.kubernetes provider 선언
+# 5.kubernetes provider 선언
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
@@ -82,13 +82,13 @@ provider "kubernetes" {
     args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name, "--profile", "root"]
   }
 }
-# 5.Kubernetes Account와 연결할 AWS 계정
+# 6.Kubernetes Account와 연결할 AWS 계정
 data "aws_iam_user" "EKS_Admin_ID" {
   user_name = "root"
 }
 
-# 6.보안그룹
-# 6-1. cluster 보안그룹
+# 7.보안그룹
+# 7-1. cluster 보안그룹
 module "add_cluster_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "~> 5.0"
@@ -115,7 +115,7 @@ module "add_cluster_sg" {
     }
   ]
 }
-# 6-2. Worker Node 보안그룹
+# 7-2. Worker Node 보안그룹
 module "add_node_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "~> 5.0"
@@ -142,7 +142,7 @@ module "add_node_sg" {
     }
   ]
 }
-# 6-3. Bastion 보안그룹
+# 7-3. Bastion 보안그룹
 module "BastionHost_SG" {
   source          = "terraform-aws-modules/security-group/aws"
   version         = "~> 5.0"
@@ -180,7 +180,7 @@ module "BastionHost_SG" {
     }
   ]
 }
-# 6-4. Public 보안그룹
+# 7-4. Public 보안그룹
 module "Public_SG" {
   source          = "terraform-aws-modules/security-group/aws"
   version         = "~> 5.0"
@@ -218,7 +218,7 @@ module "Public_SG" {
     }
   ]
 }
-# 6-5.Nat 보안그룹
+# 7-5.Nat 보안그룹
 module "NAT_SG" {
   source          = "terraform-aws-modules/security-group/aws"
   version         = "~> 5.0"
@@ -249,7 +249,7 @@ module "NAT_SG" {
     }
   ]
 }
-# 6-6. DB 보안그룹
+# 7-6. DB 보안그룹
 module "DB_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "~> 5.0"
@@ -283,14 +283,14 @@ module "DB_sg" {
   ]
 }
 
-# 7.ec2 Key-pair
+# 8.ec2 Key-pair
 data "aws_key_pair" "ec2-key" {
   key_name = "college"
 }
 
 
-# 8.EC2 생성
-# 8-1.Bastion
+# 9.EC2 생성
+# 9-1.Bastion
 resource "aws_instance" "BastionHost" {
   ami                         = "ami-0bc4327f3aabf5b71"
   instance_type               = "t2.medium"
@@ -304,7 +304,7 @@ resource "aws_instance" "BastionHost" {
   }
 }
 
-# 8-2.NAT
+# 9-2.NAT
 resource "aws_instance" "nat_ec2" {
   ami                         = "ami-0f4c2e6aee30ccae8"
   subnet_id                   = module.vpc.public_subnets[1]
@@ -318,7 +318,7 @@ resource "aws_instance" "nat_ec2" {
   }
 }
 
-# 8-3.Jenkins
+# 9-3.Jenkins
 # resource "aws_instance" "Jenkins-EC2" {
 #   ami           = "ami-040ee211cab253675"
 #   instance_type = "t3.large"
@@ -331,8 +331,8 @@ resource "aws_instance" "nat_ec2" {
 #     }
 # }
 
-# 9.라우팅 테이블
-# 9-1.Private Routing Table
+# 10.라우팅 테이블
+# 10-1.Private Routing Table
 # Private Subnet Routing Table ( dest: NAT Instance ENI )
 data "aws_route_table" "private_0" {
   subnet_id  = module.vpc.private_subnets[0]
@@ -387,7 +387,7 @@ output "bastion_ip" {
   description = "bastion-host public IP"
 }
 
-# 10. Bastion AutoScaling
+# 11. Bastion AutoScaling
 # resource "aws_launch_template" "bastion-Template" {
 
 #   name_prefix   = "college-as"
@@ -422,7 +422,7 @@ output "bastion_ip" {
 
 # }
 
-# 11.DB Subnet Group
+# 12.DB Subnet Group
 resource "aws_db_subnet_group" "college-db-subnet-group" {
   name       = "main"
   subnet_ids = [module.vpc.private_subnets[0], module.vpc.private_subnets[1]]
