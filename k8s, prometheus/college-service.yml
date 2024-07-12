@@ -1,0 +1,113 @@
+#주석으로 되어있는 부분은 #만 지워야됨. 라인 맞춰서 달아뒀음. 뒤에 한글 설명도 지워야됨. ㅇㅇ
+#파드들이 통신하기위한 service. 클래식 로드밸런서가 생성됨.
+#student service
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-svc
+  labels:
+    app: student-web
+    project: college
+  namespace: college
+spec:
+  type: NodePort
+  selector:
+    app: student-web
+  #sessionAffinity: ClientIP 클라이언트의 ip를 보고 스티키세션을 적용. 로그인 풀리는 것을 방지할 때 쓰임.
+  #sessionAffinityConfig: 스티키세션 설정
+  #  clientIP: 클라이언트의IP를
+  #    timeoutSeconds: 10800 초만큼 세션값을 고정해줌.
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+
+#롤링업데이트가 적용된 student-deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-deployment
+  namespace: college
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: student-web
+    spec:
+      containers:
+      - name: student-container
+        image: 083623472726.dkr.ecr.ap-northeast-2.amazonaws.com/college:subject-f47b9
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "400m"
+
+---
+
+# #subject service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: subject-svc
+#   labels:
+#     app: subject-web
+#     project: college
+#   namespace: college
+# spec:
+#   type: NodePort
+#   selector:
+#     app: subject-web
+#   #sessionAffinity: ClientIP 클라이언트의 ip를 보고 스티키세션을 적용. 로그인 풀리는 것을 방지할 때 쓰임.
+#   #sessionAffinityConfig: 스티키세션 설정
+#   #  clientIP: 클라이언트의IP를
+#   #    timeoutSeconds: 10800 초만큼 세션값을 고정해줌.
+#   ports:
+#   - port: 80
+#     targetPort: 80
+
+# ---
+
+# #롤링업데이트가 적용된 subject-deployment
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: subject-deployment
+#   namespace: college
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: subject-web
+#   strategy:
+#     type: RollingUpdate
+#     rollingUpdate:
+#       maxUnavailable: 1
+#       maxSurge: 1
+
+#   template:
+#     metadata:
+#       labels:
+#         app: subject-web
+#     spec:
+#       containers:
+#       - name: subject-container
+#         image: 083623472726.dkr.ecr.ap-northeast-2.amazonaws.com/college:subject_latest
+#         ports:
+#         - containerPort: 80
+#         resources:
+#           limits:
+#             memory: "500Mi"
+#             cpu: "500m"

@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::083623472726:oidc-provider/oidc.eks.ap-northeast-2.amazonaws.com/id/9F1132D2816B11BD003217450749DE3E"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "oidc.eks.ap-northeast-2.amazonaws.com/id/9F1132D2816B11BD003217450749DE3E:aud": "sts.amazonaws.com",
+                    "oidc.eks.ap-northeast-2.amazonaws.com/id/9F1132D2816B11BD003217450749DE3E:sub": "system:serviceaccount:college:external-dns"
+                }
+            }
+        }
+    ]
+}
